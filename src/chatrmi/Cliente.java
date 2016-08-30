@@ -33,6 +33,10 @@ public class Cliente extends Thread implements Runnable {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public String getNome() {
+        return nome;
+    }
 
     private void processaMsg() {
         if (mensagens.size() > 0) {

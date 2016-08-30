@@ -5,6 +5,9 @@
  */
 package chatrmi;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -21,6 +24,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -40,6 +45,10 @@ public class ChatApp extends Application {
     private Button buttonEnviar;
     Label mainMsg;
     private String lastClntMessage;
+    private VBox root;
+    //private GridPane messagesOther;
+    //private GridPane messagesMy;
+    private Integer i = 0;
 
     public ChatApp() {
         String nome = "";
@@ -66,9 +75,7 @@ public class ChatApp extends Application {
         buttonEnviar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                clnt.enviaMensagem(msgTextArea.getText());
-                System.out.println("Mensagens enviada.");
-                msgTextArea.clear();
+                enviar();
             }
         });
 
@@ -77,8 +84,22 @@ public class ChatApp extends Application {
 
         msgTextArea = new TextArea();
 
+        //msgTextArea.setMinHeight(3);
         msgTextArea.setPrefHeight(2);
+        msgTextArea.setMaxHeight(4);
         msgTextArea.setWrapText(true);
+        
+        msgTextArea.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
+            if (key.getCode() == KeyCode.ENTER && !key.isShiftDown()) {
+                enviar();
+                msgTextArea.clear();
+                msgTextArea.positionCaret(0);
+            } else if (key.getCode() == KeyCode.ENTER && key.isShiftDown()) {
+                msgTextArea.setText(msgTextArea.getText() + "\n");
+                msgTextArea.positionCaret(msgTextArea.getText().length());
+            }
+        }
+        );
 
         new Thread(new Runnable() {
             @Override
@@ -87,15 +108,57 @@ public class ChatApp extends Application {
             }
         }).start();
 
-        
-
         new AnimationTimer() {
             @Override
             public void handle(long currentNanoTime) {
                 lastClntMessage = clnt.getNewMessage();
-                System.out.print(lastClntMessage);
 
-                mainMsg.setText(mainMsg.getText() + lastClntMessage);
+                if (!lastClntMessage.equals("")) {
+                    Label newMessage = new Label();
+
+                    newMessage.setWrapText(true);
+
+                    newMessage.setStyle("-fx-border-color: white;");
+
+                    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+
+                    Date date = new Date();
+
+                    Label timeStamp = new Label(dateFormat.format(date));
+
+                    timeStamp.setStyle("-fx-font-size: 10px;");
+
+                    VBox messageBox = new VBox();
+
+                    messageBox.setAlignment(Pos.TOP_LEFT);
+
+                    String outro = lastClntMessage.substring(0, lastClntMessage.indexOf(":"));
+
+                    if (outro.equals(clnt.getNome())) {
+                        newMessage.setPadding(new Insets(0, 1, 0, 0));
+                        //newMessage.setStyle("align: right;");
+                        newMessage.setStyle("-fx-background-color: #336699; -fx-border-color: white; -fx-alignment: top-right; -fx-column-halignment: right;");
+                        //newMessage.setAlignment(Pos.CENTER_RIGHT);
+                        //newMessage.alignmentProperty().set(Pos.BASELINE_RIGHT);
+                        System.out.println("Eu msm.");
+
+                        newMessage.setAlignment(Pos.TOP_RIGHT);
+
+                        messageBox.setAlignment(Pos.TOP_RIGHT);
+
+                        newMessage.setText(lastClntMessage.trim().substring(lastClntMessage.indexOf(":") + 2));
+                    } else {
+                        newMessage.setText(lastClntMessage.trim());
+                    }
+
+                    messageBox.getChildren().addAll(newMessage, timeStamp);
+
+                    root.getChildren().add(messageBox);
+
+                    System.out.print(lastClntMessage + " " + i);
+
+                    i++;
+                }
             }
 
         }.start();
@@ -124,6 +187,15 @@ public class ChatApp extends Application {
         return hbox;
     }
 
+    public void enviar() {
+        if (msgTextArea.getText().length() > 0) {
+            clnt.enviaMensagem(msgTextArea.getText());
+            System.out.println("Mensagens enviada.");
+            msgTextArea.clear();
+            msgTextArea.positionCaret(0);
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -147,8 +219,9 @@ public class ChatApp extends Application {
         grid.add(hBox, 0, 0);
         grid.add(stack, 1, 0);
 
-        VBox root = new VBox(10);
-        root.getChildren().addAll(mainMsg);
+        root = new VBox();
+
+        //root.getChildren().addAll(mainMsg);
         root.setStyle("-fx-padding: 10;"
                 + "-fx-border-style: solid inside;"
                 + "-fx-border-width: 2;"
@@ -156,11 +229,13 @@ public class ChatApp extends Application {
                 + "-fx-border-radius: 5;"
                 + "-fx-border-color: #336699;");
 
+        //BorderPane msgPane = new BorderPane();
+        //root.getChildren().add(msgPane);
         border.setBottom(grid);
         border.setCenter(root);
 
         Scene scene = new Scene(border, 800, 600);
-
+        
         primaryStage.setTitle("Safe Chat 0.1");
         primaryStage.setScene(scene);
         primaryStage.show();
