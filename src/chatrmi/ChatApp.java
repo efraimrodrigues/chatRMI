@@ -21,6 +21,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
@@ -43,7 +44,8 @@ public class ChatApp extends Application {
     private Cliente clnt;
     private TextArea msgTextArea;
     private Button buttonEnviar;
-    Label mainMsg;
+    private ScrollPane scrollMsg;
+    //Label mainMsg;
     private String lastClntMessage;
     private VBox root;
     //private GridPane messagesOther;
@@ -64,12 +66,7 @@ public class ChatApp extends Application {
             nome = result.get();
         }
 
-        clnt = new Cliente(nome);
-
-        mainMsg = new Label();
-        mainMsg.setWrapText(true);
-        mainMsg.setText("");
-        mainMsg.setStyle("-fx-border-color: white;");
+        clnt = new Cliente(nome);        
 
         buttonEnviar = new Button("Enviar");
         buttonEnviar.setOnAction(new EventHandler<ActionEvent>() {
@@ -78,8 +75,6 @@ public class ChatApp extends Application {
                 enviar();
             }
         });
-
-        //buttonEnviar.setPrefSize(100, 20);
         buttonEnviar.setMinSize(100, 20);
 
         msgTextArea = new TextArea();
@@ -100,6 +95,8 @@ public class ChatApp extends Application {
             }
         }
         );
+        
+        scrollMsg = new ScrollPane();
 
         new Thread(new Runnable() {
             @Override
@@ -188,8 +185,8 @@ public class ChatApp extends Application {
     }
 
     public void enviar() {
-        if (msgTextArea.getText().length() > 0) {
-            clnt.enviaMensagem(msgTextArea.getText());
+        if (msgTextArea.getText().trim().length() > 0) {
+            clnt.enviaMensagem(msgTextArea.getText().trim());
             System.out.println("Mensagens enviada.");
             msgTextArea.clear();
             msgTextArea.positionCaret(0);
@@ -198,9 +195,13 @@ public class ChatApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        
+        
 
         //mainTextArea.setEditable(false);
         BorderPane border = new BorderPane();
+        Scene scene = new Scene(border, 800, 600);
+        
         HBox hBox = addHBox();
 
         StackPane stack = new StackPane();
@@ -228,13 +229,43 @@ public class ChatApp extends Application {
                 + "-fx-border-insets: 5;"
                 + "-fx-border-radius: 5;"
                 + "-fx-border-color: #336699;");
+        
+        VBox.setVgrow(root, Priority.ALWAYS);
+        
+        //root.fillWidthProperty();
+        //root.autosize();
+        
+        
+        scrollMsg.setContent(root);
 
         //BorderPane msgPane = new BorderPane();
         //root.getChildren().add(msgPane);
+        
+        VBox test = new VBox();
+        
+        test.setStyle("-fx-padding: 10;"
+                + "-fx-border-style: solid inside;"
+                + "-fx-border-width: 2;"
+                + "-fx-border-insets: 5;"
+                + "-fx-border-radius: 5;"
+                + "-fx-border-color: #336699;");
+        
+        test.getChildren().add(scrollMsg);
+        
+        scrollMsg.prefWidthProperty().bind(test.widthProperty());
+        scrollMsg.prefHeightProperty().bind(test.heightProperty());
+        
+        scrollMsg.setFitToHeight(true);
+        scrollMsg.setFitToWidth(true);
+        
+        //root.prefHeightProperty().bind(scrollMsg.heightProperty());
+        //root.prefWidthProperty().bind(scrollMsg.widthProperty());
+        
         border.setBottom(grid);
-        border.setCenter(root);
-
-        Scene scene = new Scene(border, 800, 600);
+        border.setCenter(scrollMsg);
+        
+        
+        
         
         primaryStage.setTitle("Safe Chat 0.1");
         primaryStage.setScene(scene);
@@ -247,7 +278,6 @@ public class ChatApp extends Application {
      * @param args
      */
     public static void main(String[] args) {
-
         launch(args);
     }
 

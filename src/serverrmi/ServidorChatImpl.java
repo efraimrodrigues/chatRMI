@@ -1,5 +1,6 @@
-package chatrmi;
+package serverrmi;
 
+import chatrmi.ServidorChat;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;

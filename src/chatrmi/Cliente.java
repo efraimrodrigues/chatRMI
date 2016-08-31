@@ -88,25 +88,4 @@ public class Cliente extends Thread implements Runnable {
         }
     }
 
-public static void main(String args[]) {
-        try {
-            Cliente c = new Cliente("Teste");
-            
-            c.start();
-            
-            String msg = "";
-            
-            while(true) {
-                Scanner scanner = new Scanner(System.in);
-                
-                msg = scanner.nextLine();
-                
-                c.enviaMensagem(msg);   
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }
