@@ -1,5 +1,6 @@
 package chatrmi;
 
+import static java.lang.System.exit;
 import java.rmi.*;
 import javax.swing.*;
 import java.util.Scanner;
@@ -11,7 +12,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Application;
 
 public class Cliente extends Thread implements Runnable {
 
@@ -24,7 +24,9 @@ public class Cliente extends Thread implements Runnable {
         this.nome = nome;
 
         try {
-            this.chat = (ServidorChat) Naming.lookup("rmi://localhost:1098/ServidorChat");
+            if (this.chat == null) {
+                this.chat = (ServidorChat) Naming.lookup("rmi://localhost:1099/ServidorChat");
+            }
         } catch (NotBoundException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (MalformedURLException ex) {
@@ -33,41 +35,46 @@ public class Cliente extends Thread implements Runnable {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public String getNome() {
         return nome;
     }
 
-    private void processaMsg() {
-        if (mensagens.size() > 0) {
-            System.out.println(mensagens.poll());
-        }
-    }
-    
     public String getNewMessage() {
         String ret = "";
-        if(mensagens.size() > 0) 
+        if (mensagens.size() > 0) {
             ret = mensagens.poll();
-        
+        }
+
         return ret;
     }
 
     @Override
+    @SuppressWarnings("empty-statement")
     public void run() {
         try {
             int cont = chat.lerMensagem().size();
 
-            System.out.println("Lendo mensagens.");
+            ArrayList<String> msgArray = null;
 
             while (true) {
-                if (chat.lerMensagem().size() > cont) {
-                    this.armazenaMensagem(chat.lerMensagem().get(chat.lerMensagem().size() - 1));
-                    cont++;
-                    System.out.println("Mensagem recebida.");
+                
+                Thread.sleep(500);
+
+                synchronized (chat) {
+                    msgArray = chat.lerMensagem();
+                }
+
+                int msgSize = msgArray.size();
+
+                for (; msgSize > cont; cont++) {
+                    this.armazenaMensagem(msgArray.get(msgSize - 1));
                 }
             }
 
         } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -79,10 +86,33 @@ public class Cliente extends Thread implements Runnable {
             }
         }
     }
+    
+    public void adicionarUsuarioOnline(String username) {
+        try {
+            chat.adicionarUsuarioOnline(username);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void removeUsuarioOnline(String username) {
+        try {
+            chat.removeUsuarioOnline(username);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     public void enviaMensagem(String msg) {
         try {
-            chat.enviarMensagem(this.nome + ": " + msg + "\n");
+            if(msg.equalsIgnoreCase("whoisonline")) {
+                String lista = "Safe Chat:\n";
+                for(String user : chat.getUsuariosOnline())
+                    lista += user + " está online.\n";
+                
+                mensagens.add(lista);
+            } else
+                chat.enviarMensagem(this.nome + ": " + msg + "\n");
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }

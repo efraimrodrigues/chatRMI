@@ -1,0 +1,7 @@
+/* AUTOMATICALLY GENERATED ON Sat Sep 10 14:49:29 GMT-03:00 2016*/
+/* DO NOT EDIT */
+
+grant codeBase "file:/c:/Users/Efraim Rodrigues/Documents/NetBeansProjects/chatRMI/src" {
+  permission java.security.AllPermission;
+};
+
