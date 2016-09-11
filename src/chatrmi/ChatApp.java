@@ -40,7 +40,7 @@ import javafx.stage.WindowEvent;
  */
 public class ChatApp extends Application {
 
-    private Cliente clnt;
+    private Cliente cliente;
     private TextArea msgTextArea;
     private Button buttonEnviar;
     private ScrollPane scrollMsg;
@@ -52,25 +52,10 @@ public class ChatApp extends Application {
     private Integer i = 0;
 
     public ChatApp() {
-        
-        String nome = "";
+
+        cliente = new Cliente();
+
         lastClntMessage = "";
-
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Itendificação");
-        dialog.setHeaderText("Identifique-se");
-        dialog.setContentText("Por favor, digite seu nome:");
-
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            nome = result.get();
-        }
-
-        clnt = new Cliente(nome);
-        
-        clnt.adicionarUsuarioOnline(nome);
-        
-        clnt.enviaMensagem("Cheguei.");
 
         buttonEnviar = new Button("Enviar");
         buttonEnviar.setOnAction(new EventHandler<ActionEvent>() {
@@ -105,8 +90,8 @@ public class ChatApp extends Application {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (clnt) {
-                    clnt.run();
+                synchronized (cliente) {
+                    cliente.run();
                 }
             }
         }).start();
@@ -114,7 +99,7 @@ public class ChatApp extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long currentNanoTime) {
-                lastClntMessage = clnt.getNewMessage();
+                lastClntMessage = cliente.getNewMessage();
 
                 if (!lastClntMessage.equals("")) {
                     Label newMessage = new Label();
@@ -137,9 +122,9 @@ public class ChatApp extends Application {
 
                     String outro = lastClntMessage.substring(0, lastClntMessage.indexOf(":"));
 
-                    if (outro.equals(clnt.getNome())) {
+                    if (outro.equals(cliente.getNome())) {
                         newMessage.setPadding(new Insets(0, 1, 0, 0));
-                        
+
                         newMessage.setStyle("-fx-background-color: #336699; -fx-border-color: white; -fx-alignment: top-right; -fx-column-halignment: right;");
 
                         newMessage.setAlignment(Pos.TOP_RIGHT);
@@ -156,7 +141,6 @@ public class ChatApp extends Application {
                     root.getChildren().add(messageBox);
 
                     //System.out.println(lastClntMessage + " " + i);
-
                     scrollMsg.setVvalue(1.0);
                     scrollMsg.setHvalue(1.0);
 
@@ -179,25 +163,48 @@ public class ChatApp extends Application {
 
     public void enviar() {
         if (msgTextArea.getText().trim().length() > 0) {
-            clnt.enviaMensagem(msgTextArea.getText().trim());
+            cliente.enviaMensagem(msgTextArea.getText().trim());
         }
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        
+
         primaryStage.getIcons().add(new Image("file:send.png"));
-        
+
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            public void handle (WindowEvent t) {
-                clnt.enviaMensagem("Fui.");
-                
-                clnt.removeUsuarioOnline(clnt.getNome());
-                
-                Platform.exit();
-                System.exit(0);
+            public void handle(WindowEvent t) {
+                cliente.exit();
             }
         });
+
+        String nome = "";       
+
+        TextInputDialog dialog = new TextInputDialog("Digite seu nome aqui.");
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("file:send.png"));
+        
+        dialog.setTitle("Itendificação");
+        dialog.setHeaderText("Identifique-se");
+        dialog.setContentText("Por favor, digite seu nome:");
+
+        Optional<String> result = null;
+        boolean validUsername = false;
+        while (!validUsername) {
+            result = dialog.showAndWait();
+
+            if (result.isPresent()) {
+                nome = result.get();
+            }
+
+            if (!nome.equalsIgnoreCase("") && !nome.equalsIgnoreCase("Digite seu nome aqui.") && !cliente.isOnline(nome)) {
+                validUsername = true;
+            } else {
+                dialog.setContentText("Este nome é inválido, tente outro.");
+            }
+        }
+
+        cliente.login(nome);
 
         //mainTextArea.setEditable(false);
         BorderPane border = new BorderPane();

@@ -10,4 +10,5 @@ public interface ServidorChat extends Remote {
         abstract public void adicionarUsuarioOnline(String username) throws RemoteException;
         abstract public void removeUsuarioOnline(String username) throws RemoteException;
         abstract public ArrayList<String> getUsuariosOnline() throws RemoteException;
+        abstract public boolean isOnline(String username) throws RemoteException;
 }

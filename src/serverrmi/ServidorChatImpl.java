@@ -28,11 +28,12 @@ public class ServidorChatImpl extends java.rmi.server.UnicastRemoteObject implem
     
     public void adicionarUsuarioOnline(String username) throws RemoteException {
         this.usuariosOnline.put(username,username);
-        System.out.print(username + " logou.");
+        System.out.print(username + " logou.\n");
     }
     
     public void removeUsuarioOnline(String username) throws RemoteException {
         this.usuariosOnline.remove(username);
+        System.out.println(username + " saiu.\n");
     }
     
     public ArrayList<String> getUsuariosOnline() throws RemoteException {
@@ -41,5 +42,9 @@ public class ServidorChatImpl extends java.rmi.server.UnicastRemoteObject implem
             ret.add(key);
         
         return ret;
+    }
+
+    public boolean isOnline(String username) throws RemoteException {
+        return usuariosOnline.containsKey(username);
     }
 }

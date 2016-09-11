@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 
 public class Cliente extends Thread implements Runnable {
 
@@ -20,9 +21,9 @@ public class Cliente extends Thread implements Runnable {
 
     private static Queue<String> mensagens = new LinkedList<String>();
 
-    public Cliente(String nome) {
-        this.nome = nome;
-
+    public Cliente() {
+        nome = "";
+        
         try {
             if (this.chat == null) {
                 this.chat = (ServidorChat) Naming.lookup("rmi://localhost:1099/ServidorChat");
@@ -38,6 +39,10 @@ public class Cliente extends Thread implements Runnable {
 
     public String getNome() {
         return nome;
+    }
+    
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getNewMessage() {
@@ -58,7 +63,7 @@ public class Cliente extends Thread implements Runnable {
             ArrayList<String> msgArray = null;
 
             while (true) {
-                
+
                 Thread.sleep(500);
 
                 synchronized (chat) {
@@ -79,6 +84,25 @@ public class Cliente extends Thread implements Runnable {
         }
     }
 
+    public void enviaMensagem(String msg) {
+        try {
+            if (msg.equalsIgnoreCase("whoisonline")) {
+                String lista = "Safe Chat:\n";
+                for (String user : chat.getUsuariosOnline()) {
+                    lista += user + " está online.\n";
+                }
+
+                mensagens.add(lista);
+            } else if (msg.equalsIgnoreCase("tchau")) {
+                exit();
+            } else {
+                chat.enviarMensagem(this.nome + ": " + msg + "\n");
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     private void armazenaMensagem(String msg) {
         synchronized (mensagens) {
             if (!msg.equals("exit")) {
@@ -86,7 +110,7 @@ public class Cliente extends Thread implements Runnable {
             }
         }
     }
-    
+
     public void adicionarUsuarioOnline(String username) {
         try {
             chat.adicionarUsuarioOnline(username);
@@ -94,7 +118,7 @@ public class Cliente extends Thread implements Runnable {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void removeUsuarioOnline(String username) {
         try {
             chat.removeUsuarioOnline(username);
@@ -103,19 +127,55 @@ public class Cliente extends Thread implements Runnable {
         }
     }
 
-    public void enviaMensagem(String msg) {
+    public ArrayList<String> getUsuariosOnline() {
+        ArrayList<String> ret = null;
         try {
-            if(msg.equalsIgnoreCase("whoisonline")) {
-                String lista = "Safe Chat:\n";
-                for(String user : chat.getUsuariosOnline())
-                    lista += user + " está online.\n";
-                
-                mensagens.add(lista);
-            } else
-                chat.enviarMensagem(this.nome + ": " + msg + "\n");
+            synchronized (chat) {
+                ret = chat.getUsuariosOnline();
+            }
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        return ret;
     }
 
+    public boolean isOnline(String username) {
+        boolean ret = false;
+        try {
+            ret = chat.isOnline(username);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return ret;
+    }
+    
+    public void login(String nome) {
+        setNome(nome);
+        
+        adicionarUsuarioOnline(nome);
+
+        enviaMensagem("Cheguei.");
+    }
+    
+    public void exit() {
+        enviaMensagem("Fui.");
+
+        removeUsuarioOnline(getNome());
+
+        Platform.exit();
+        System.exit(0);
+    }
+
+    @Override
+    protected void finalize() {
+        try {
+            exit();
+            super.finalize();
+        } catch (Throwable ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
 }
