@@ -1,24 +1,32 @@
 package serverrmi;
 
-import chatrmi.ServidorChat;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import chatrmi.ChatCon;
+import java.security.spec.RSAPublicKeySpec;
 
-public class ServidorChatImpl extends java.rmi.server.UnicastRemoteObject implements ServidorChat {
+public class ChatConImpl extends java.rmi.server.UnicastRemoteObject implements ChatCon {
 
     private ArrayList<String> mensagens;
     private HashMap<String,String> usuariosOnline;
+    private Integer contador;
 
-    public ServidorChatImpl() throws RemoteException {
+    public ChatConImpl() throws RemoteException {
         super();
         this.mensagens = new ArrayList<String>();
         this.usuariosOnline = new HashMap<String,String>();
+        this.contador = 0;
     }
 
     public void enviarMensagem(String mensagem) throws RemoteException {
         synchronized (mensagens) {
+            if(mensagens.size() > 20)
+                mensagens.remove(0);
+            
+            this.contador++;
             mensagens.add(mensagem);
+            
         }
     }
 
@@ -38,13 +46,18 @@ public class ServidorChatImpl extends java.rmi.server.UnicastRemoteObject implem
     
     public ArrayList<String> getUsuariosOnline() throws RemoteException {
         ArrayList<String> ret = new ArrayList<String>();
-        for(String key : usuariosOnline.values())
+        for(String key : usuariosOnline.keySet())
             ret.add(key);
         
         return ret;
     }
-
     public boolean isOnline(String username) throws RemoteException {
         return usuariosOnline.containsKey(username);
     }
+    
+    public Integer getContador() throws RemoteException {
+        return contador;
+    }
+
+    
 }

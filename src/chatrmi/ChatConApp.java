@@ -12,6 +12,8 @@ import java.util.Optional;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -19,6 +21,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
@@ -38,9 +41,9 @@ import javafx.stage.WindowEvent;
  *
  * @author Efraim Rodrigues
  */
-public class ChatApp extends Application {
+public class ChatConApp extends Application {
 
-    private Cliente cliente;
+    private ChatConCliente cliente;
     private TextArea msgTextArea;
     private Button buttonEnviar;
     private ScrollPane scrollMsg;
@@ -51,9 +54,9 @@ public class ChatApp extends Application {
     //private GridPane messagesMy;
     private Integer i = 0;
 
-    public ChatApp() {
+    public ChatConApp() {
 
-        cliente = new Cliente();
+        cliente = new ChatConCliente();
 
         lastClntMessage = "";
 
@@ -73,6 +76,18 @@ public class ChatApp extends Application {
         msgTextArea.setPrefHeight(2);
         msgTextArea.setMaxHeight(4);
         msgTextArea.setWrapText(true);
+
+        msgTextArea.textProperty().addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(final ObservableValue<? extends String> ov, final String oldValue, final String newValue) {
+                if (msgTextArea.getText().length() > 500) {
+                    String s = msgTextArea.getText().substring(0, 500);
+                    msgTextArea.setText(s);
+                }
+            }
+
+        });
 
         msgTextArea.addEventHandler(KeyEvent.KEY_RELEASED, (key) -> {
             if (key.getCode() == KeyCode.ENTER && !key.isShiftDown()) {
@@ -104,6 +119,8 @@ public class ChatApp extends Application {
                 if (!lastClntMessage.equals("")) {
                     Label newMessage = new Label();
 
+                    newMessage.setMaxHeight(Double.MAX_VALUE);
+
                     newMessage.setWrapText(true);
 
                     newMessage.setStyle("-fx-border-color: white;");
@@ -120,6 +137,7 @@ public class ChatApp extends Application {
 
                     messageBox.setAlignment(Pos.TOP_LEFT);
 
+                    //messageBox.
                     String outro = lastClntMessage.substring(0, lastClntMessage.indexOf(":"));
 
                     if (outro.equals(cliente.getNome())) {
@@ -135,14 +153,21 @@ public class ChatApp extends Application {
                     } else {
                         newMessage.setText(lastClntMessage.trim());
                     }
+                    
+                    //newMessage.setPrefHeight(100);
+                    newMessage.textOverrunProperty().set(OverrunStyle.CLIP);
 
+                    newMessage.setMinHeight(Label.USE_PREF_SIZE);
+                    
                     messageBox.getChildren().addAll(newMessage, timeStamp);
+                    
 
                     root.getChildren().add(messageBox);
 
                     //System.out.println(lastClntMessage + " " + i);
                     scrollMsg.setVvalue(1.0);
                     scrollMsg.setHvalue(1.0);
+                    scrollMsg.setPrefViewportHeight(1.0);
 
                     i++;
                 }
@@ -178,12 +203,12 @@ public class ChatApp extends Application {
             }
         });
 
-        String nome = "";       
+        String nome = "";
 
         TextInputDialog dialog = new TextInputDialog("Digite seu nome aqui.");
         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
         stage.getIcons().add(new Image("file:send.png"));
-        
+
         dialog.setTitle("Itendificação");
         dialog.setHeaderText("Identifique-se");
         dialog.setContentText("Por favor, digite seu nome:");

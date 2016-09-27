@@ -1,13 +1,13 @@
 package serverrmi;
 
-import chatrmi.ServidorChat;
 import java.rmi.Naming;
 import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
+import chatrmi.ChatCon;
 
-public class Servidor {
+public class ChatConServidor {
 
-    public Servidor() {
+    public ChatConServidor() {
         try {
             //System.setSecurityManager(new RMISecurityManager());
             //if (System.getSecurityManager() == null) {
@@ -17,7 +17,7 @@ public class Servidor {
             
             LocateRegistry.createRegistry(1099);
             
-            ServidorChat server = new ServidorChatImpl();
+            ChatCon server = new ChatConImpl();
 
             //ServidorChat inter = (ServidorChat) UnicastRemoteObject.exportObject (server,1098);
             Naming.bind("ServidorChat", (Remote) server);
@@ -28,6 +28,6 @@ public class Servidor {
     }
 
     public static void main(String args[]) {
-        new Servidor();
+        new ChatConServidor();
     }
 }
