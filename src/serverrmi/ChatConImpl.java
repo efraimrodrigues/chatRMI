@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import chatrmi.ChatCon;
-import java.security.spec.RSAPublicKeySpec;
 
 public class ChatConImpl extends java.rmi.server.UnicastRemoteObject implements ChatCon {
 

@@ -13,9 +13,9 @@ public class ChatConServidor {
             //if (System.getSecurityManager() == null) {
             //    System.setSecurityManager(new SecurityManager());
             //}
-            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+            System.setProperty("java.rmi.server.hostname", "10.130.16.101");
             
-            LocateRegistry.createRegistry(1099);
+            LocateRegistry.createRegistry(1098);
             
             ChatCon server = new ChatConImpl();
 

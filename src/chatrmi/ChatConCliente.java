@@ -1,54 +1,27 @@
 package chatrmi;
 
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import static java.lang.System.exit;
 import java.rmi.*;
-import javax.swing.*;
-import java.util.Scanner;
-import java.lang.Thread.*;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.rmi.RemoteException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
+
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 public class ChatConCliente extends Thread implements Runnable, Serializable {
 
@@ -67,7 +40,7 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
 
         try {
             if (this.chat == null) {
-                this.chat = (ChatCon) Naming.lookup("rmi://127.0.0.1:1099/ServidorChat");
+                this.chat = (ChatCon) Naming.lookup("rmi://10.130.16.101:1098/ServidorChat");
             }
 
             key = new SecretKeySpec(senha, encAlgo);
@@ -234,15 +207,11 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
 
             cipher.init(Cipher.DECRYPT_MODE, key);
 
-            com.sun.org.apache.xml.internal.security.Init.init();
-
-            ret = new String(cipher.doFinal(Base64.decode(encryptedMessage.getBytes())), Charset.forName("UTF8"));
+            ret = new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage.getBytes())), Charset.forName("UTF8"));
 
         } catch (IllegalBlockSizeException ex) {
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BadPaddingException ex) {
-            Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Base64DecodingException ex) {
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -265,7 +234,7 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
 
             byte[] encryptedMessage = cipher.doFinal(message.getBytes());
 
-            ret = new String(Base64.encode(encryptedMessage));
+            ret = new String(Base64.getEncoder().encode(encryptedMessage));
 
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
