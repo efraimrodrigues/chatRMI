@@ -3,8 +3,11 @@ package serverrmi;
 import java.rmi.Naming;
 import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
-import chatrmi.ChatConInterface;
 
+/**
+ *
+ * @author Efraim Rodrigues
+ */
 public class ChatConServidor {
 
     public ChatConServidor() {
@@ -13,7 +16,7 @@ public class ChatConServidor {
             //if (System.getSecurityManager() == null) {
             //    System.setSecurityManager(new SecurityManager());
             //}
-            System.setProperty("java.rmi.server.hostname", "192.168.0.17");
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
             
             LocateRegistry.createRegistry(1099);
             

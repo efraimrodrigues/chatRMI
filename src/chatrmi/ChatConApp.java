@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package chatrmi;
 
 import java.text.DateFormat;
@@ -12,7 +7,6 @@ import java.util.Optional;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
-import static javafx.application.Platform.exit;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -104,15 +98,6 @@ public class ChatConApp extends Application {
 
         scrollMsg = new ScrollPane();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (cliente) {
-                    cliente.run();
-                }
-            }
-        }).start();
-
         new AnimationTimer() {
             @Override
             public void handle(long currentNanoTime) {
@@ -139,7 +124,6 @@ public class ChatConApp extends Application {
 
                     messageBox.setAlignment(Pos.TOP_LEFT);
 
-                    //messageBox.
                     String outro = lastClntMessage.substring(0, lastClntMessage.indexOf(":"));
 
                     if (outro.equals(cliente.getNome())) {
@@ -167,7 +151,6 @@ public class ChatConApp extends Application {
 
                     root.getChildren().add(messageBox);
 
-                    //System.out.println(lastClntMessage + " " + i);
                     scrollMsg.setVvalue(1.0);
                     scrollMsg.setHvalue(1.0);
                     scrollMsg.setPrefViewportHeight(1.0);
@@ -236,6 +219,15 @@ public class ChatConApp extends Application {
         }
 
         cliente.login(nome);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (cliente) {
+                    cliente.run();
+                }
+            }
+        }).start();
 
         //mainTextArea.setEditable(false);
         BorderPane border = new BorderPane();
