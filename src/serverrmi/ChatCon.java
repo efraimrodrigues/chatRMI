@@ -1,15 +1,62 @@
 package serverrmi;
 
-import chatrmi.*;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-public interface ChatCon extends Remote {
-	abstract public void enviarMensagem(String mensagem) throws RemoteException;
-	abstract public ArrayList<String> lerMensagem() throws RemoteException;
-        abstract public void adicionarUsuarioOnline(String username) throws RemoteException;
-        abstract public void removeUsuarioOnline(String username) throws RemoteException;
-        abstract public ArrayList<String> getUsuariosOnline() throws RemoteException;
-        abstract public boolean isOnline(String username) throws RemoteException;
-        abstract public Integer getContador() throws RemoteException;
+import java.util.HashMap;
+import chatrmi.ChatConInterface;
+
+public class ChatCon extends java.rmi.server.UnicastRemoteObject implements ChatConInterface {
+
+    private ArrayList<String> mensagens;
+    private HashMap<String,String> usuariosOnline;
+    private Integer contador;
+
+    public ChatCon() throws RemoteException {
+        super();
+        this.mensagens = new ArrayList<String>();
+        this.usuariosOnline = new HashMap<String,String>();
+        this.contador = 0;
+    }
+
+    public void enviarMensagem(String mensagem) throws RemoteException {
+        synchronized (mensagens) {
+            if(mensagens.size() > 20)
+                mensagens.remove(0);
+            
+            this.contador++;
+            mensagens.add(mensagem);
+            System.out.println(mensagem);
+        }
+    }
+
+    public ArrayList<String> lerMensagem() throws RemoteException {
+        return mensagens;
+    }
+    
+    public void adicionarUsuarioOnline(String username) throws RemoteException {
+        this.usuariosOnline.put(username,username);
+        System.out.print(username + " logou.\n");
+    }
+    
+    public void removeUsuarioOnline(String username) throws RemoteException {
+        this.usuariosOnline.remove(username);
+        System.out.println(username + " saiu.\n");
+    }
+    
+    public ArrayList<String> getUsuariosOnline() throws RemoteException {
+        ArrayList<String> ret = new ArrayList<String>();
+        for(String key : usuariosOnline.keySet())
+            ret.add(key);
+        
+        return ret;
+    }
+    public boolean isOnline(String username) throws RemoteException {
+        return usuariosOnline.containsKey(username);
+    }
+    
+    public Integer getContador() throws RemoteException {
+        return contador;
+    }
+
+    
 }

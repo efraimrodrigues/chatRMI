@@ -26,7 +26,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class ChatConCliente extends Thread implements Runnable, Serializable {
 
     private String nome;
-    private static ChatCon chat;
+    private static ChatConInterface chat;
 
     private String encAlgo = "AES";
     private static Key key;
@@ -40,23 +40,19 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
 
         try {
             if (this.chat == null) {
-                this.chat = (ChatCon) Naming.lookup("rmi://10.130.16.101:1098/ServidorChat");
+                this.chat = (ChatConInterface) Naming.lookup("rmi://192.168.0.17:1099/ServidorChat");
             }
 
             key = new SecretKeySpec(senha, encAlgo);
-
-            /*KeyFactory kf = KeyFactory.getInstance(encAlgo);
-
-            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encPublicKey);
-            publicKey = kf.generatePublic(publicKeySpec);
-
-            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encPrivateKey);
-            privateKey = kf.generatePrivate(privateKeySpec);*/
+            
         } catch (NotBoundException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (MalformedURLException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -106,8 +102,10 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
             }
 
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -124,12 +122,13 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
                 mensagens.add(lista);
             } else if (msg.equalsIgnoreCase("@tchau")) {
                 exit();
-            } else if (msg.equalsIgnoreCase("@help")) {
+            } else if (msg.equalsIgnoreCase("@help") || msg.equalsIgnoreCase("@")) {
                 mensagens.add("Safe Chat: \nDigite @whoisonline para ver os usuários online.\nDigite @tchau para se despedir e sair do chat.");
             } else {
                 chat.enviarMensagem(encryptMessage(msgFinal));
             }
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -146,6 +145,7 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         try {
             chat.adicionarUsuarioOnline(username);
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -154,6 +154,7 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         try {
             chat.removeUsuarioOnline(username);
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -165,6 +166,7 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
                 ret = chat.getUsuariosOnline();
             }
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -176,6 +178,7 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         try {
             ret = chat.isOnline(username);
         } catch (RemoteException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -210,14 +213,19 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
             ret = new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage.getBytes())), Charset.forName("UTF8"));
 
         } catch (IllegalBlockSizeException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BadPaddingException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchPaddingException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidKeyException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -237,14 +245,19 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
             ret = new String(Base64.getEncoder().encode(encryptedMessage));
 
         } catch (NoSuchAlgorithmException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchPaddingException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidKeyException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalBlockSizeException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BadPaddingException ex) {
+            exit();
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
 

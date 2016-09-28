@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.Optional;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
+import static javafx.application.Platform.exit;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -33,6 +35,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -144,6 +147,8 @@ public class ChatConApp extends Application {
 
                         newMessage.setStyle("-fx-background-color: #336699; -fx-border-color: white; -fx-alignment: top-right; -fx-column-halignment: right;");
 
+                        newMessage.setTextFill(Color.web("#ffffff"));
+
                         newMessage.setAlignment(Pos.TOP_RIGHT);
 
                         messageBox.setAlignment(Pos.TOP_RIGHT);
@@ -152,14 +157,13 @@ public class ChatConApp extends Application {
                     } else {
                         newMessage.setText(lastClntMessage.trim());
                     }
-                    
+
                     //newMessage.setPrefHeight(100);
                     newMessage.textOverrunProperty().set(OverrunStyle.CLIP);
 
                     newMessage.setMinHeight(Label.USE_PREF_SIZE);
-                    
+
                     messageBox.getChildren().addAll(newMessage, timeStamp);
-                    
 
                     root.getChildren().add(messageBox);
 
@@ -219,6 +223,9 @@ public class ChatConApp extends Application {
 
             if (result.isPresent()) {
                 nome = result.get();
+            } else {
+                Platform.exit();
+                System.exit(0);
             }
 
             if (!nome.equalsIgnoreCase("") && !nome.equalsIgnoreCase("Digite seu nome aqui.") && !cliente.isOnline(nome)) {
