@@ -1,22 +1,22 @@
 ## An end-to-end encryption online chat application using Java RMI
 
 ### Intro
-Let's take the typical Alice and Bob scenario for instance. In this scenario Bob wants to communicate with Alice in a secure way. A client/server application is enough to satisfy Alice's and Bob's needs. However, end to end encryption will be used to ensure a man-in-the-middle atack is not feasible. So, this will be a real time chat which will have its messages centralized in the server.  The centralized messages must be encrypted in a way only the clients are able to decrypher them. Sender and receiver information will be encrypted too.
+Let's take the typical Alice and Bob scenario for instance. In this scenario Bob wants to communicate with Alice in a secure way. A client/server application is enough to satisfy Alice's and Bob's needs. However, end to end encryption will be used to ensure a man-in-the-middle attack is not feasible. So, this will be a real time chat which will have its messages centralized in the server.  The centralized messages must be encrypted in a way only the clients are able to decipher them. Sender and receiver information will be encrypted too.
 
-Server and clients are set with a symmetric key so they can safely exchange identity and asynmmetric keys. As a result of this it will be impossible for a sniffer to identify clients and public keys. To address the process of identifying and communication between users and servers, each user will generate a pair of assymetric keys locally and will share their public keys with the server service. It is important to mention that this communication will be done with a symmetric encryption technique. So, even if somehow a sniffer puts hands on the symmetric key, this sniffer might be able to decrypt one's public key. But will never be able to decrypt a message because the end user is the only one able to do that with its private key (which was never shared).
+Server and clients are set with a symmetric key so they can safely exchange identity and asymmetric keys. As a result of this it will be impossible for a sniffer to identify clients and public keys. To address the process of identifying and communication between users and servers, each user will generate a pair of asymmetric keys locally and will share their public keys with the server service. It is important to mention that this communication will be done with a symmetric encryption technique. So, even if somehow a sniffer puts hands on the symmetric key, this sniffer might be able to decrypt one's public key. But will never be able to decrypt a message because the end user is the only one able to do that with its private key (which was never shared).
 
 > Symmetric Encryption Technique: AES
 
-> Assynmetric Encryption Technique: RSA
+> Asymmetric Encryption Technique: RSA
 
 ### Java RMI
-All the communication is done over the Java RMI interface. RMI stands for Remote Method Invocation. This programming interface allows you to invoce remote classes' methods.  Most of Java RMI applications implement two applications, server and client. The server application will hold a server object and allow clients to use its methods. Client applications are required to have access to the objects interface, so they are oblivious to the way these methods are implemented. 
+All the communication is done over the Java RMI interface. RMI stands for Remote Method Invocation. This programming interface allows you to invoke remote classes' methods.  Most of Java RMI applications implement two applications, server and client. The server application will hold a server object and allow clients to use its methods. Client applications are required to have access to the objects interface, so they are oblivious to the way these methods are implemented. 
 
 Java RMI classes must extends from the <code>java.rmi.Remote</code> class.
 
 ## Implementation
 ***
-### Serverside
+### Server side
 As stated before, Java RMI applications implement a client and server. Before proceeding to the central object of the server, let's lay eyes on <code>ChatConUserInterface</code>.  This interface represents a user.
 
 	public interface ChatConUserInterface extends Remote,Serializable  {
@@ -38,7 +38,7 @@ As stated before, Java RMI applications implement a client and server. Before pr
 4.<code>abstract Integer getContador() throws RemoteException;</code>
 	Returns the current size of the buffer
 
-In addition,the central object of the server is the class ChatCon which is an implementation of ChatConInterface as follows:
+In addition, the central object of the server is the class ChatCon which is an implementation of ChatConInterface as follows:
 
 	public interface ChatConInterface extends Remote {
 		abstract public void enviarMensagem(String user, String mensagem) throws RemoteException;
@@ -69,5 +69,5 @@ This interface supports simple operations:
 6.<code>abstract public boolean isOnline(String username) throws RemoteException;</code>
 	Simply returns true if user is online, false otherwise
 	
-### Clientside
+### Client side
 Perhaps the client side application is the simplest one because it will only use what is already implemented. For this application, it is required that <code>ChatConInterface</code> and <code>ChatConUserInterface</code> are visible. 
