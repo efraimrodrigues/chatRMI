@@ -27,15 +27,19 @@ As stated before, Java RMI applications implement a client and server. Before pr
 	}
 	
 1.<code>abstract void enviarMensagem(String mensagem) throws RemoteException;</code>
+	
 	This method gets and adds a message to the user's mailbox or buffer represented by a list of strings. These strings shall be consumed by the client application. 
 	
 2.<code>abstract ArrayList<String> getMensagens() throws RemoteException;</code>
+	
 	This will simply return the buffer of messages.	
 	
 3.<code>abstract String getPublicKey() throws RemoteException;</code>
+	
 	User's public key will be retreived by other user's for encryption
 	
 4.<code>abstract Integer getContador() throws RemoteException;</code>
+	
 	Returns the current size of the buffer
 
 In addition, the central object of the server is the class ChatCon which is an implementation of ChatConInterface as follows:
@@ -52,21 +56,27 @@ In addition, the central object of the server is the class ChatCon which is an i
 This interface supports simple operations:
 
 1.<code>abstract public void enviarMensagem(String user, String mensagem) throws RemoteException;</code>
+	
 	Gets the username and encrypted message (receiver's private key) and forwards to the user
 	
 2.<code>abstract public ChatConUserInterface adicionaUsuario(String username, String publicKey) throws RemoteException;</code>
+	
 	Instantiates and returns a <code>ChatConUser</code>. Used for a user to login
 	
 3.<code>abstract public void removeUsuario(String username) throws RemoteException;</code>
+	
 	Removes the specific user from the list of users. It's used to logout
 	
 4.<code>abstract public ArrayList<String> getUsuarios() throws RemoteException;</code>
+	
 	Returns the list of logged in users.
 	
 5.<code>abstract public String getPublicKey(String username) throws RemoteException;</code>
+	
 	Returns the public key of a certain user
 	
 6.<code>abstract public boolean isOnline(String username) throws RemoteException;</code>
+	
 	Simply returns true if user is online, false otherwise
 	
 ### Client side
