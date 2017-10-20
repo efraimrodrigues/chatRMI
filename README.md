@@ -80,4 +80,4 @@ Returns the public key of a certain user
 Simply returns true if user is online, false otherwise
 	
 ### Client side
-Perhaps the client side application is the simplest one because it will only use what is already implemented. For this application, it is required that <code>ChatConInterface</code> and <code>ChatConUserInterface</code> are visible. 
+Perhaps the client side application is the simplest one because it will only use what is already implemented. For this, it is only required that <code>ChatConInterface</code> and <code>ChatConUserInterface</code> are visible.
