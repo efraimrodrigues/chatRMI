@@ -52,6 +52,10 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
     private KeyPair keyPair;
 
     private static final Queue<String> mensagens = new LinkedList<>();
+ 
+    /**
+     *
+     */
 
     public ChatConCliente() {
         nome = "";
@@ -69,14 +73,26 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNome() {
         return nome;
     }
 
+    /**
+     *
+     * @param nome
+     */
     public void setNome(String nome) {
         this.nome = nome;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getNewMessage() {
         String ret = "";
         if (mensagens.size() > 0) {
@@ -121,7 +137,11 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
             Logger.getLogger(ChatConCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    /**
+     *
+     * @param msg
+     */
     public void enviaMensagem(String msg) {
         String msgFinal = this.nome + ": " + msg + "\n";
 
@@ -159,6 +179,10 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<String> getUsuariosOnline() {
         ArrayList<String> ret = new ArrayList<>();
         try {
@@ -177,6 +201,11 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         return ret;
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     */
     public boolean isOnline(String username) {
         boolean ret = false;
         try {
@@ -189,6 +218,10 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         return ret;
     }
 
+    /**
+     *
+     * @param nome
+     */
     public void login(String nome) {
         try {
             setNome(nome);
@@ -219,6 +252,9 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         }
     }
 
+    /**
+     *
+     */
     public void exit() {
         enviaMensagem("Fui.");
 
@@ -228,6 +264,11 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         System.exit(0);
     }
 
+    /**
+     *
+     * @param encryptedMessage
+     * @return
+     */
     public String decrypt(String encryptedMessage) {
         String ret = "";
 
@@ -245,6 +286,11 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         return ret;
     }
 
+    /**
+     *
+     * @param message
+     * @return
+     */
     public String encrypt(String message) {
         String ret = "";
 
@@ -264,6 +310,11 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         return ret;
     }
 
+    /**
+     *
+     * @param encryptedMessage
+     * @return
+     */
     public String decryptMessage(String encryptedMessage) {
         String ret = "";
         try {
@@ -279,6 +330,12 @@ public class ChatConCliente extends Thread implements Runnable, Serializable {
         return ret;
     }
     
+    /**
+     *
+     * @param message
+     * @param key
+     * @return
+     */
     public String encryptMessage(String message, RSAPublicKey key) {
         String ret = "";
         try {

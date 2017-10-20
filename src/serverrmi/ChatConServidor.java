@@ -24,7 +24,7 @@ public class ChatConServidor {
 
             //ServidorChat inter = (ServidorChat) UnicastRemoteObject.exportObject (server,1098);
             Naming.bind("ServidorChat", (Remote) server);
-            System.out.println("Servidor online.");
+            System.out.println("Server online.");
         } catch (Exception e) {
             System.out.println("Trouble: " + e.toString());
         }
